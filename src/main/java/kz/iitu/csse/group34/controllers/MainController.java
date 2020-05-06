@@ -69,26 +69,25 @@ public class MainController {
         return "redirect:/";
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_MODERATOR')")
     @PostMapping("/deleteCom{id}")
         public String deltecom(@PathVariable Long id,@RequestParam Long post_id) {
             commentsRepository.delete(commentsRepository.findById(id).orElse(null));
             return "redirect:/details"+post_id;
     }
 
-    @PostMapping("/deleteComment{id}")
-    public String deletecomment(@PathVariable Long id){
-
-        return "redirect:/";
-    }
-
 
     @GetMapping("/details{id}")
     public String details(@PathVariable Long id,Model model){
         List<Comments> comments = commentsRepository.findAllByNewsPostId(id);
+        comments.sort(Comparator.comparing(Comments::getPostDate));
+        Collections.reverse(comments);
         model.addAttribute("item", newsPostRepository.findById(id).orElse(null));
         model.addAttribute("comments",comments );
-        model.addAttribute("user",getUserData());
+        model.addAttribute("user", getUserData());
+        Long aidi = 0L;
+        if (getUserData()!=null)
+            aidi = getUserData().getId();
+        model.addAttribute("aidi",aidi);
         int neg=0,pos=0,neu=0,status;
         for (Comments com : comments) {
             if (com.getType() == 0) pos++;
@@ -154,6 +153,21 @@ public class MainController {
         newsPostRepository.deleteAll(posts);
         userRepository.delete(u);
         return "redirect:/users";
+    }
+
+    @GetMapping("/editCom{id}")
+    public String editcom(ModelMap map,@PathVariable Long id) {
+        map.addAttribute("comment",commentsRepository.findById(id).orElse(null));
+        return "editcom";
+    }
+
+    @PostMapping("/editCom")
+    public String editcomm(@RequestParam String comment, @RequestParam String post_id, @RequestParam String com_id) {
+        //String com = map.getAttribute("comment").toString();
+        Comments com = commentsRepository.findById(Long.parseLong(com_id)).orElse(null);
+        com.setComment(comment);
+        commentsRepository.save(com);
+        return "redirect:/details"+post_id;
     }
 
     @PostMapping("/editUser")
@@ -285,6 +299,7 @@ public class MainController {
     public String search(String search, Model model){
         HashSet<NewsPost> set = new HashSet<>();
         List<NewsPost> list = newsPostRepository.findAll();
+        list.sort(Comparator.comparing(NewsPost::getPostDate));
         for(NewsPost n : list) {
             if(n.getContent().contains(search) || n.getShortContent().contains(search) || n.getTitle().contains(search)) {
                 set.add(n);

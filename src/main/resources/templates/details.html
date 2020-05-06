@@ -54,17 +54,7 @@
             <div>
                 <a th:text="${item.content}"></a>
             </div>
-            <div th:switch="${status}" class="mt-20">
-                <h3 th:text="#{movie_rating}"></h3>
-                <a th:case="'1'" ><h3 th:text="#{negative}"></h3></a>
-                <a th:case="'2'" ><h3 th:text="#{mostly_negative}"></h3></a>
-                <a th:case="'3'"><h3 th:text="#{neutral}"></h3></a>
-                <a th:case="'4'"><h3  th:text="#{mostly_positive}"></h3></a>
-                <a th:case="'5'" ><h3 th:text="#{positive}"></h3></a>
-                <a th:case="'0'" ><h3 th:text="#{nothing}"></h3></a>
-            </div>
             <div>
-
                 <a style="color: red" th:text="${#sets.size(item.likes)}"></a>
                 <form style="display: inline-block" th:if="${#sets.contains(item.likes, user)}"
                       th:action="@{'/unlikePost'+${item.id}}" method="post">
@@ -75,6 +65,15 @@
                       th:action="@{'/likePost'+${item.id}}" method="post">
                     <button id="heart"><i class="fa fa-heart-o" aria-hidden="true"></i></button>
                 </form>
+            </div>
+            <div th:switch="${status}" class="mt-20">
+                <h3 th:text="#{movie_rating}"></h3>
+                <a th:case="'1'" ><h3 th:text="#{negative}"></h3></a>
+                <a th:case="'2'" ><h3 th:text="#{mostly_negative}"></h3></a>
+                <a th:case="'3'"><h3 th:text="#{neutral}"></h3></a>
+                <a th:case="'4'"><h3  th:text="#{mostly_positive}"></h3></a>
+                <a th:case="'5'" ><h3 th:text="#{positive}"></h3></a>
+                <a th:case="'0'" ><h3 th:text="#{nothing}"></h3></a>
             </div>
                 <form th:action="@{'/deletePost'+${item.id}}" sec:authorize="hasRole('ROLE_MODERATOR')" method="post">
                     <button class="genric-btn danger" th:text="#{delete}">DELETE</button>
@@ -118,16 +117,25 @@
                             <button id="heart1"><i class="fa fa-heart-o" aria-hidden="true"></i></button>
                             <input type="hidden" name="post_id" th:value="${item.id}">
                         </form>
-
                         </div>
-
                     </div>
-
+                    <div th:if="${com.author.id} == ${aidi}">
+                        <form sec:authorize = "hasAnyRole('ROLE_USER','ROLE_ADMIN','ROLE_MODERATOR')" method="post"
+                              th:action="@{'/deleteCom'+${com.id}}">
+                            <button class="genric-btn danger">DELETE</button>
+                            <input type="hidden" th:value="${item.id}" name="post_id">
+                        </form>
+                        <form method="get" th:action="@{'/editCom'+${com.id}}">
+                            <button class="genric-btn warning">EDIT</button>
+                        </form>
+                    </div>
+                    <div th:unless="${com.author.id} == ${aidi}">
                     <form sec:authorize="hasAnyRole('ROLE_MODERATOR')" method="post" style="display:inline-block; margin:auto"
                           th:action="@{'/deleteCom'+${com.id}}">
                         <button class="genric-btn danger" th:text="#{delete}">DELETE</button>
                         <input type="hidden" th:value="${item.id}" name="post_id">
                     </form>
+                    </div>
                 </li>
                 <li th:case="'1'" class="mt-20 cont">
                     <div class="forma" style="background-color: #FFCCCB">
@@ -153,13 +161,21 @@
                                     <input type="hidden" name="post_id" th:value="${item.id}">
                                 </form>
                             </div>
-
                     </div>
+                    <div th:if="${com.author.id} == ${aidi}">
+                        <form sec:authorize = "hasAnyRole('ROLE_USER','ROLE_ADMIN','ROLE_MODERATOR')" method="post"
+                              th:action="@{'/deleteCom'+${com.id}}">
+                            <button class="genric-btn danger">DELETE</button>
+                            <input type="hidden" th:value="${item.id}" name="post_id">
+                        </form>
+                    </div>
+                    <div th:unless="${com.author.id} == ${aidi}">
                     <form sec:authorize="hasAnyRole('ROLE_MODERATOR')" method="post"
                           th:action="@{'/deleteCom'+${com.id}}">
                         <button class="genric-btn danger">DELETE</button>
                         <input type="hidden" th:value="${item.id}" name="post_id">
                     </form>
+                    </div>
                 </li>
                 <li th:case="'2'" class="mt-20 cont">
                     <div style="background-color: #D3D3D3" class="forma">
@@ -186,11 +202,20 @@
                             </form>
                         </div>
                     </div>
+                    <div th:if="${com.author.id} == ${aidi}">
+                        <form sec:authorize = "hasAnyRole('ROLE_USER','ROLE_ADMIN','ROLE_MODERATOR')" method="post"
+                              th:action="@{'/deleteCom'+${com.id}}">
+                            <button class="genric-btn danger">DELETE</button>
+                            <input type="hidden" th:value="${item.id}" name="post_id">
+                        </form>
+                    </div>
+                    <div th:unless="${com.author.id} == ${aidi}">
                     <form sec:authorize="hasAnyRole('ROLE_MODERATOR')" method="post"
                           th:action="@{'/deleteCom'+${com.id}}">
                         <button class="genric-btn danger">DELETE</button>
                         <input type="hidden" th:value="${item.id}" name="post_id">
                     </form>
+                    </div>
                 </li>
 
             </ul>
